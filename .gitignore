@@ -1,0 +1,11 @@
+backend/ReviasMiUs.Api/.keys/
+backend/**/bin/
+backend/**/obj/
+frontend/dist/
+frontend/node_modules/
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+.env
+.env.*
+*.log

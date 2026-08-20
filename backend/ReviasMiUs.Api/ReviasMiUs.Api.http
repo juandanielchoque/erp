@@ -1,0 +1,121 @@
+@host = http://localhost:5210
+@token = PEGAR_ACCESS_TOKEN_DEL_LOGIN
+@customerId = REEMPLAZAR_CON_ID_DE_CLIENTE
+@productId = REEMPLAZAR_CON_ID_DE_PRODUCTO
+@salesOrderId = REEMPLAZAR_CON_ID_DE_COTIZACION
+@userId = REEMPLAZAR_CON_ID_DE_CAJERO
+@cashShiftId = REEMPLAZAR_CON_ID_DE_TURNO
+@kitchenTicketId = REEMPLAZAR_CON_ID_DE_COMANDA
+
+### Iniciar sesion y copiar accessToken
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@revias.local",
+  "password": "Admin123!"
+}
+
+### Consultar la identidad autenticada
+GET {{host}}/api/auth/me
+Authorization: Bearer {{token}}
+
+GET {{host}}/
+Accept: application/json
+
+### Obtener identificadores de clientes
+GET {{host}}/api/customers
+Accept: application/json
+
+### Obtener identificadores de productos
+GET {{host}}/api/products
+Accept: application/json
+
+### Crear cotizacion en borrador
+POST {{host}}/api/sales-orders
+Content-Type: application/json
+
+{
+  "customerId": "{{customerId}}",
+  "lines": [
+    {
+      "productId": "{{productId}}",
+      "quantity": 2
+    }
+  ],
+  "validUntilUtc": "2027-12-31T23:59:59Z",
+  "notes": "Entrega coordinada con el cliente"
+}
+
+### Consultar cotizacion
+GET {{host}}/api/sales-orders/{{salesOrderId}}
+Accept: application/json
+
+### Listar solo borradores
+GET {{host}}/api/sales-orders?status=Draft
+Accept: application/json
+
+### Confirmar cotizacion y descontar stock
+POST {{host}}/api/sales-orders/{{salesOrderId}}/confirm
+Accept: application/json
+
+### Cancelar documento y reponer stock si estaba confirmado
+POST {{host}}/api/sales-orders/{{salesOrderId}}/cancel
+Accept: application/json
+
+### Listar usuarios y copiar el ID del cajero
+GET {{host}}/api/users
+Accept: application/json
+
+### Abrir turno de caja antes de vender
+POST {{host}}/api/cash-shifts/open
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "terminal": "Caja principal",
+  "openingCash": 100
+}
+
+### Consultar mesas
+GET {{host}}/api/restaurant/tables
+Accept: application/json
+
+### Venta POS completa con boleta interna
+POST {{host}}/api/pos/checkout
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "customerId": "{{customerId}}",
+  "lines": [
+    {
+      "productId": "{{productId}}",
+      "quantity": 1
+    }
+  ],
+  "serviceType": "DineIn",
+  "tableNumber": "Mesa 01",
+  "paymentMethod": "Cash",
+  "documentType": "Receipt"
+}
+
+### Consultar comandas
+GET {{host}}/api/kitchen/tickets
+Accept: application/json
+
+### Avanzar una comanda: pendiente, preparacion, lista y entregada
+POST {{host}}/api/kitchen/tickets/{{kitchenTicketId}}/advance
+Accept: application/json
+
+### Consultar comprobantes internos
+GET {{host}}/api/billing/documents
+Accept: application/json
+
+### Cerrar turno de caja
+POST {{host}}/api/cash-shifts/{{cashShiftId}}/close
+Content-Type: application/json
+
+{
+  "countedCash": 159
+}
